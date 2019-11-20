@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Browser</title>
+    <link rel="stylesheet" href="css/css/font-awesome.css">
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        webview {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body id="browser">
+<div class="custom-panel" id="drag-window">
+    <div class="left-menu">
+        <div class="tabs" id="tab-list">
+            <div class="tab" id="select-tab" data-view-id="8800555" ">
+                <span>Google</span>
+            </div>
+        </div>
+        <div class="add-tab" id="add-tab">
+            <span class="add"><i class="fa fa-plus"></i></span>
+        </div>
+    </div>
+
+    <div class="brower-btns">
+        <span id="min-btn"><i class="fa fa-window-minimize" aria-hidden="true"></i></span>
+        <span id="max-btn"><i class="fa fa-window-restore" aria-hidden="true"></i></span>
+        <span id="close-btn"><i class="fa fa-times" aria-hidden="true"></i></span>
+    </div>
+</div>
+<nav id="navigation">
+    <div id="back">
+        <i class="fa fa-arrow-left" aria-hidden="true"></i>
+    </div>
+    <div id="forward">
+        <i class="fa fa-arrow-right" aria-hidden="true"></i>
+    </div>
+    <div id="refresh">
+        <i class="fa fa-refresh" aria-hidden="true"></i>
+    </div>
+    <div id="omnibox">
+        <input type="text" id="url">
+    </div>
+    <div id="fave">
+        <i class="fa fa-star" aria-hidden="true"></i>
+    </div>
+    <div id="fave-popup" data-state="closed">
+    </div>
+    <div id="list">
+        <i class="fa fa-list" aria-hidden="true"></i>
+    </div>
+    <div id="console">
+        <i class="fa fa-terminal" aria-hidden="true"></i>
+    </div>
+</nav>
+<div id="views">
+    <webview id="8800555" class="page" src="http://www.google.com/" autosize="on" preload="spy.js" style="display: flex"></webview>
+</div>
+<script>
+    require('./renderer.js')
+    require('./spy.js')
+</script>
+</body>
+</html>

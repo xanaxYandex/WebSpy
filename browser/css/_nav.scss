@@ -1,0 +1,204 @@
+$buttons_Width: 180px;
+body {
+    height: 100%;
+}
+
+.custom-panel {
+    -webkit-app-region: drag;
+    width: 100%;
+    height: 30px;
+    display: flex;
+    justify-content: space-between;
+    background: #1e1f21;
+
+    .left-menu {
+        display: flex;
+        justify-content: space-between;
+
+        .tabs {
+            margin-right: 10px;
+            -webkit-app-region: no-drag;
+            display: flex;
+            align-items: flex-end;
+
+
+            .tab {
+                margin-left: 5px;
+                border-radius: 10px 10px 0px 0px;
+                padding: 5px 10px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: #383c3e;
+                color: #cdcdcd;
+                font-family: "Segoe UI Light";
+                min-width: 70px;
+                width: 250px;
+                height: 20px;
+
+                .close-tab {
+                    transition: .3s;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    border-radius: 50px;
+                    width: 20px;
+                    height: 20px;
+                    color: white;
+
+                    &:hover {
+                        transition: .3s;
+                        background: rgba(255, 255, 255, 0.67);
+                        color: black;
+                    }
+                }
+            }
+        }
+        .add-tab {
+            transition: 0.3s;
+            -webkit-app-region: no-drag;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 30px;
+            color: white;
+            border-radius: 50px;
+
+            .add {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.58);
+                color: black;
+                transition: 0.3s;
+            }
+        }
+    }
+
+
+
+    .brower-btns {
+        -webkit-app-region: no-drag;
+        display: flex;
+        justify-content: space-between;
+        span {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 5px 10px;
+            i {
+                font-size: 18px;
+                color: white;
+            }
+            &:hover {
+                background: rgba(255, 255, 255, 0.27);
+            }
+        }
+    }
+}
+
+
+.common-buttons
+{
+    float: left;
+    display: block;
+    width: $buttons_Width / 6;
+    font-size: 20px;
+    color: $white;
+    i 
+    {
+        cursor: pointer;
+    }
+}
+#navigation 
+{
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    width: 100%;
+    height: 40px;
+    background: #383c3e;
+    box-sizing: border-box;
+    #back
+    {
+        @extend .common-buttons;
+    }
+    #forward
+    {
+        @extend .common-buttons;
+    }
+    #refresh
+    {
+        @extend .common-buttons;
+    }
+    #fave {
+        @extend .common-buttons;
+    }
+    #list {
+        @extend .common-buttons;
+    }
+    #omnibox
+    {
+        float: left;
+        display: block;
+        width: calc(100% - #{$buttons_Width});
+        color: #333333;
+        input
+        {
+            padding-left: 20px;
+            padding-right: 20px;
+            border: none;
+            outline: none;
+            height: 25px;
+            width: 90%;
+            border-radius: 10px;
+            color: $black;
+            font-family: "Segoe UI";
+        }
+    }
+    #console
+    {
+        @extend .common-buttons;
+    }
+    #fave-popup
+    {
+        display: none;
+        position: fixed;
+        right: 1px;
+        color: $white;
+        top: 29px;
+        width: 180px;
+        height: 200px;
+        z-index: 20;
+        padding: 1px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        text-overflow: ellipsis; 
+        white-space: nowrap;
+        background: $blue;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+        .link 
+        {
+            width: 100%;
+            height: 32px;
+            color: $white;
+            font-family: monospace;
+            font-size: 13px;
+            text-decoration: none;
+            text-align: left;
+            display: block;
+            line-height: 32px;
+            .favicon 
+            {
+                width: 32px;
+                height: 32px;
+                float: left;
+                background: $white;
+            }
+        }
+    }
+}

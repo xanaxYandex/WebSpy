@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Log reader</title>
+</head>
+<body>
+<div id="info"></div>
+<h3>ID of device can be found in browser -> View -> Toogle Developer Tools -> Console</h3>
+<form id="params">
+    <input type="text" name="deviceId" placeholder="ID of device">
+    <input type="radio" name="interval" value="1"><span> - Daily</span>
+    <input type="radio" name="interval" value="2"><span> - Weekly</span>
+    <input type="radio" name="interval" value="3"><span> - Monthly</span>
+    <button id="subm">Get logs</button>
+</form>
+<script>
+    require('./renderer.js');
+</script>
+</body>
+</html>
