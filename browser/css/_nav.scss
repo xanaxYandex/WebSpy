@@ -21,8 +21,8 @@ body {
             display: flex;
             align-items: flex-end;
 
-
             .tab {
+                position: relative;
                 margin-left: 5px;
                 border-radius: 10px 10px 0px 0px;
                 padding: 5px 10px;
@@ -36,8 +36,18 @@ body {
                 width: 250px;
                 height: 20px;
 
+                .title {
+                    white-space: nowrap; /* Запрещаем перенос строк */
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    width: 89%;
+                }
+
                 .close-tab {
                     transition: .3s;
+                    position: absolute;
+                    top: 5px;
+                    right: 10px;
                     display: flex;
                     justify-content: center;
                     align-items: center;
@@ -77,8 +87,6 @@ body {
             }
         }
     }
-
-
 
     .brower-btns {
         -webkit-app-region: no-drag;

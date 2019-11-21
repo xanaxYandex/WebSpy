@@ -3,17 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <title>Log reader</title>
+    <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-<div id="info"></div>
-<h3>ID of device can be found in browser -> View -> Toogle Developer Tools -> Console</h3>
-<form id="params">
-    <input type="text" name="deviceId" placeholder="ID of device">
-    <input type="radio" name="interval" value="1"><span> - Daily</span>
-    <input type="radio" name="interval" value="2"><span> - Weekly</span>
-    <input type="radio" name="interval" value="3"><span> - Monthly</span>
-    <button id="subm">Get logs</button>
-</form>
+<div class="wrapper">
+    <div class="header">
+        <h1>Log reader</h1>
+    </div>
+    <div class="instruction">
+        <p>ID of device can be found in browser -> View -> Toogle Developer Tools -> Console</p>
+    </div>
+
+    <div class="wrap-up">
+        <form id="params" >
+            <div class="option-block">
+                <input class="inputId" type="text" name="deviceId" placeholder="ID of device"
+                       value="31302e302e313833363277696e3332496e74656c28522920436f726528544d292069352d3835303020435055204020332e303047487a433a5c55736572735c53616e74616e79616e"
+                >
+                <div class="options">
+                    <input type="radio" name="interval" value="1"><span> Daily</span>
+                    <input type="radio" name="interval" value="2"><span> Weekly</span>
+                    <input type="radio" name="interval" value="3"><span> Monthly</span>
+                </div>
+                <button id="subm">Get logs</button>
+            </div>
+        </form>
+        <div class="chart">
+            <canvas id="my-chart" width="400" height="400"></canvas>
+        </div>
+    </div>
+
+    <div id="info" class="wrap-log"></div>
+</div>
+
 <script>
     require('./renderer.js');
 </script>

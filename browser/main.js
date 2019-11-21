@@ -14,6 +14,7 @@ const cpu = os.cpus()[os.cpus().length - 1].model;
 const homedir = os.homedir();
 
 let lastUrl = 'http://www.google.com/';
+let lastSiteTitle = 'Google';
 let deviceId = rel + platform + cpu + homedir.replace(/\s/g, '');
 const bufferText = Buffer.from(deviceId, 'utf8');
 deviceId = bufferText.toString('hex');

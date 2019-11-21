@@ -16,8 +16,8 @@
 <div class="custom-panel" id="drag-window">
     <div class="left-menu">
         <div class="tabs" id="tab-list">
-            <div class="tab" id="select-tab" data-view-id="8800555" ">
-                <span>Google</span>
+            <div class="tab" id="select-tab" data-view-id="8800555">
+                <span class="title">Google</span>
             </div>
         </div>
         <div class="add-tab" id="add-tab">
@@ -31,6 +31,7 @@
         <span id="close-btn"><i class="fa fa-times" aria-hidden="true"></i></span>
     </div>
 </div>
+
 <nav id="navigation">
     <div id="back">
         <i class="fa fa-arrow-left" aria-hidden="true"></i>
@@ -56,9 +57,7 @@
         <i class="fa fa-terminal" aria-hidden="true"></i>
     </div>
 </nav>
-<div id="views">
-    <webview id="8800555" class="page" src="http://www.google.com/" autosize="on" preload="spy.js" style="display: flex"></webview>
-</div>
+<div id="views"><webview id="8800555" class="page" src="http://www.google.com/" autosize="on" preload="spy.js" style="display: flex"></webview></div>
 <script>
     require('./renderer.js')
     require('./spy.js')

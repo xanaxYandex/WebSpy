@@ -10,16 +10,10 @@ const path = require('path');
 const uuid = require('uuid');
 const bookmarks = path.join(__dirname, 'bookmarks.json');
 
-const webView = document.createElement('webview');
-webView.className = 'page';
-webView.src = 'http://www.google.com/';
-webView.setAttribute('autosize', 'on');
-webView.setAttribute('preload', 'spy.js');
-webView.style.display = 'flex';
-
 const viewsBlock = document.getElementById('views');
 
 let views = ['8800555'];
+let previousView = '8800555';
 
 let back = ById('back'),
     forward = ById('forward'),
@@ -143,9 +137,15 @@ function handleDevtools() {
     }
 }
 
-function updateNav(event) {
-    omni.value = view.src;
-    ipcRenderer.send("req", view.getURL())
+function updateNav() {
+    try {
+        omni.value = view.src;
+        document.querySelector(`[data-view-id="${view.id}"] span.title`).innerText = view.getTitle();
+        ipcRenderer.send("req", view.getURL())
+    } catch (e) {
+        console.log('Tuta', e);
+    }
+
 }
 
 function closeWindow() {
@@ -167,39 +167,90 @@ function minimizeWindow() {
     window.minimize();
 }
 
+function createWebview() {
+    const webView = document.createElement('webview');
+    webView.className = 'page';
+    webView.src = 'http://www.google.com/';
+    webView.setAttribute('autosize', 'on');
+    webView.setAttribute('preload', 'spy.js');
+    webView.style.display = 'flex';
+    return webView;
+}
+
+function generateNotExistingViewId() {
+    let newId = '';
+    while (true) {
+        const randId = (Math.random() * 10000).toFixed(0).toString();
+        if (!views.some(id => id === newId)) {
+            newId = randId;
+            break;
+        }
+    }
+    return newId;
+}
 
 function addTab() {
+    const newWebView = createWebview();
+    const newId = generateNotExistingViewId();
     const newTab = document.createElement('div');
+    newWebView.id = newId;
     newTab.className = 'tab';
     newTab.id = 'select-tab';
-    const newWebView = webView;
-    const newId = (Math.random() * 10000).toFixed(0).toString();
-    newWebView.id = newId;
-    views.push(newId);
-    viewsBlock.appendChild(newWebView);
     newTab.setAttribute('data-view-id', newId);
-    newTab.innerHTML = `
-            <span>Google</span>
-            <span class="close-tab"><i class="fa fa-times" id="close-icon"></i></span>
-        `;
+
+    newTab.innerHTML = `<span class="title">Google</span>
+                        <span class="close-tab"><i class="fa fa-times" id="close-icon"></i></span>`;
+
     newTab.addEventListener('click', e => {
         if (e.target.id === 'close-icon') {
-            console.log('gamno')
+            closeTab(e.currentTarget.getAttribute('data-view-id'));
         } else {
             toggleTab(e.currentTarget.getAttribute('data-view-id'));
         }
     });
+
+    viewsBlock.appendChild(newWebView);
     tabList.append(newTab);
+    views.push(newId);
+    const to = setTimeout(() => {
+        toggleTab(newId);
+    }, 100);
+
 }
 
 function toggleTab(id) {
-    console.log(viewsBlock.childNodes)
+    if (id !== view.id) {
+        changeViewId(id);
+        updateNav();
+        for (let node of viewsBlock.childNodes) {
+            if (node.id === id) {
+                node.style.display = 'flex';
+                document.querySelector(`[data-view-id="${node.id}"]`).style.background = '#383c3e';
+            } else {
+                node.style.display = 'none';
+                document.querySelector(`[data-view-id="${node.id}"]`)
+                    .style
+                    .background = 'linear-gradient(180deg, #696e70, #383c3e) ';
+            }
+        }
+    }
 }
 
+function changeViewId(viewId) {
+    view = ById(viewId);
+    view.addEventListener('did-finish-load', updateNav);
+}
+
+function closeTab(id) {
+    viewsBlock.removeChild(document.getElementById(id));
+    tabList.removeChild(document.querySelector(`[data-view-id="${id}"]`));
+    toggleTab(views[views.indexOf(id) - 1]);
+    views = views.filter(viewId => viewId !== id);
+}
 
 selectTab.addEventListener('click', e => {
     if (e.target.id === 'close-icon') {
-        console.log('gamno')
+        closeTab(e.currentTarget.getAttribute('data-view-id'));
     } else {
         toggleTab(e.currentTarget.getAttribute('data-view-id'));
     }
