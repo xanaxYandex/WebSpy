@@ -8,6 +8,7 @@ const logScema = new Schema({
     day: Number,
     url: String,
     keys: String,
+    timeSpent: Number,
     deviceId:{
         type : String,
         required:true

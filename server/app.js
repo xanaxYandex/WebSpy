@@ -7,22 +7,22 @@ const Log = require('./models/log');
 app.use(cors());
 app.use(bodyParser.json());
 
-Date.prototype.getWeek = function(){
+Date.prototype.getWeek = function () {
     const day_miliseconds = 86400000,
-        onejan = new Date(this.getFullYear(),0,1,0,0,0),
-        onejan_day = (onejan.getDay()===0) ? 7 : onejan.getDay(),
-        days_for_next_monday = (8-onejan_day),
+        onejan = new Date(this.getFullYear(), 0, 1, 0, 0, 0),
+        onejan_day = (onejan.getDay() === 0) ? 7 : onejan.getDay(),
+        days_for_next_monday = (8 - onejan_day),
         onejan_next_monday_time = onejan.getTime() + (days_for_next_monday * day_miliseconds),
-        first_monday_year_time = (onejan_day>1) ? onejan_next_monday_time : onejan.getTime(),
-        this_date = new Date(this.getFullYear(), this.getMonth(),this.getDate(),0,0,0),// This at 00:00:00
+        first_monday_year_time = (onejan_day > 1) ? onejan_next_monday_time : onejan.getTime(),
+        this_date = new Date(this.getFullYear(), this.getMonth(), this.getDate(), 0, 0, 0),// This at 00:00:00
         this_time = this_date.getTime(),
         days_from_first_monday = Math.round(((this_time - first_monday_year_time) / day_miliseconds));
 
     const first_monday_year = new Date(first_monday_year_time);
-    return (days_from_first_monday>=0 && days_from_first_monday<364) ? Math.ceil((days_from_first_monday+1)/7) : 52;
+    return (days_from_first_monday >= 0 && days_from_first_monday < 364) ? Math.ceil((days_from_first_monday + 1) / 7) : 52;
 };
 
-const getDailyLogs = async (deviceId) =>{
+const getDailyLogs = async (deviceId) => {
     try {
         const day = new Date().getDate();
         const week = new Date().getWeek();
@@ -35,12 +35,12 @@ const getDailyLogs = async (deviceId) =>{
             year,
             deviceId
         });
-    }catch(e){
+    } catch (e) {
         return null;
     }
 };
 
-const getWeeklyLogs = async (deviceId) =>{
+const getWeeklyLogs = async (deviceId) => {
     try {
         const week = new Date().getWeek();
         const month = new Date().getMonth();
@@ -51,12 +51,12 @@ const getWeeklyLogs = async (deviceId) =>{
             year,
             deviceId
         });
-    }catch(e){
+    } catch (e) {
         return null;
     }
 };
 
-const getMonthlyLogs = async (deviceId) =>{
+const getMonthlyLogs = async (deviceId) => {
     try {
         const month = new Date().getMonth();
         const year = new Date().getFullYear();
@@ -65,13 +65,13 @@ const getMonthlyLogs = async (deviceId) =>{
             year,
             deviceId
         });
-    }catch(e){
+    } catch (e) {
         return null;
     }
 };
 
-app.post('/addLog',async (req,res)=>{
-    try{
+app.post('/addLog', async (req, res) => {
+    try {
         const logData = req.body;
         const date = new Date(logData.date);
         const year = date.getFullYear();
@@ -85,18 +85,28 @@ app.post('/addLog',async (req,res)=>{
             day,
             url: logData.url,
             deviceId: logData.deviceId,
+            timeSpent: logData.timeSpent,
             keys: logData.keys,
             dateAsStr: logData.date
         });
         await log.save();
-    }catch(e){
+    } catch (e) {
         console.log(e);
-        return res.status(500).send({ok:false})
+        return res.status(500).send({ok: false})
     }
-    return res.status(200).send({ok:true})
+    return res.status(200).send({ok: true})
 });
 
-app.get('/logs',async (req,res)=>{
+app.delete('/logs', async (req, res) => {
+    try {
+        await Log.deleteMany({})
+    } catch (e) {
+        console.log(e);
+        return res.status(500).send('Ne drop');
+    }
+});
+
+app.get('/logs', async (req, res) => {
     try {
         const deviceId = req.query.deviceId;
         const interval = +req.query.interval;
@@ -118,16 +128,22 @@ app.get('/logs',async (req,res)=>{
                 return res.status(400).send({ok: false})
         }
         return res.status(200).send(data);
-    }catch(e){
-        return res.status(400).send({ok: false,error:e.message})
+    } catch (e) {
+        return res.status(400).send({ok: false, error: e.message})
     }
 });
 
-mongoose.connect('mongodb+srv://megaSpy:123321@logs-xjeen.gcp.mongodb.net/test?retryWrites=true&w=majority')
-    .then(()=>{
+
+mongoose.connect('mongodb+srv://megaSpy:123321@logs-xjeen.gcp.mongodb.net/test?retryWrites=true&w=majority', {
+    useNewUrlParser: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
+    useUnifiedTopology: true
+})
+    .then(() => {
         console.log('connection established on port 3000');
         app.listen(3000);
     })
-    .catch((e)=>console.log(e));
+    .catch((e) => console.log(e));
 
 

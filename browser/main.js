@@ -12,19 +12,27 @@ const rel = os.release();
 const platform = os.platform();
 const cpu = os.cpus()[os.cpus().length - 1].model;
 const homedir = os.homedir();
-
+let lastDate = new Date().toISOString()
 let lastUrl = 'http://www.google.com/';
-let lastSiteTitle = 'Google';
 let deviceId = rel + platform + cpu + homedir.replace(/\s/g, '');
 const bufferText = Buffer.from(deviceId, 'utf8');
 deviceId = bufferText.toString('hex');
+
+function normilizeTime(time) {
+    time = (time / 100000).toFixed(2);
+    if (time >= 0.6) {
+        time = (time / 0.6).toFixed(2);
+    }
+    return time;
+}
 
 const addLog = async (url = '') => {
     return await axios.post('http://localhost:3000/addLog', {
         deviceId,
         url,
+        timeSpent: normilizeTime(Date.now() - new Date(lastDate)),
         keys: keylogs.join(','),
-        date: new Date().toISOString()
+        date: lastDate
     })
 };
 
@@ -47,10 +55,14 @@ function createWindow() {
         slashes: true
     }));
 
-    mainWindow.on('closed', async function () {
-        await addLog(lastUrl);
-        keylogs = [];
-        mainWindow = null
+     mainWindow.on('closed', async function () {
+         try {
+             await addLog(lastUrl);
+             keylogs = [];
+             mainWindow = null
+         } catch (e) {
+             console.log('TUTA', e);
+         }
     });
 }
 
@@ -80,6 +92,7 @@ ipcMain.on("req", async (e, url) => {
     await addLog(lastUrl);
     lastUrl = url;
     keylogs = [];
+    lastDate = new Date().toISOString()
 });
 
 ipcMain.on("key", (e, data) => {

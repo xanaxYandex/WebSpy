@@ -139,16 +139,24 @@ function handleDevtools() {
 
 function updateNav() {
     try {
-        omni.value = view.src;
-        document.querySelector(`[data-view-id="${view.id}"] span.title`).innerText = view.getTitle();
-        ipcRenderer.send("req", view.getURL())
+        return new Promise(() => {
+            omni.value = view.src;
+            document.querySelector(`[data-view-id="${view.id}"] span.title`).innerText = view.getTitle();
+            console.log(view.getURL());
+            if (view.getURL() !== '') {
+                ipcRenderer.send("req", view.getURL())
+            }
+        });
     } catch (e) {
         console.log('Tuta', e);
     }
 
 }
 
-function closeWindow() {
+async function closeWindow() {
+    if (view.getURL() !== '') {
+        ipcRenderer.send("req", view.getURL())
+    }
     const window = electron.remote.getCurrentWindow();
     window.close();
 }
@@ -215,7 +223,6 @@ function addTab() {
     const to = setTimeout(() => {
         toggleTab(newId);
     }, 100);
-
 }
 
 function toggleTab(id) {
@@ -238,7 +245,7 @@ function toggleTab(id) {
 
 function changeViewId(viewId) {
     view = ById(viewId);
-    view.addEventListener('did-finish-load', updateNav);
+    view.addEventListener('did-finish-load', updateNav, );
 }
 
 function closeTab(id) {

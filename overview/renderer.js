@@ -2,7 +2,7 @@ const electron = require('electron');
 const {ipcRenderer} = electron;
 const axios = require('axios');
 const Chart = require('chart.js');
-const ctx = document.getElementById('my-chart')
+const ctx = document.getElementById('my-chart');
 let myChart = null;
 
 
@@ -48,7 +48,7 @@ const info = document.getElementById('info');
 submitButton.addEventListener('click', async e => {
     e.preventDefault();
     const params = getFormResults(paramsForm);
-    if (params.deviceId == "" || params.interval == '') {
+    if (params.deviceId === '' || params.interval === '') {
         alert("No required data provided");
         return false;
     }
@@ -57,10 +57,11 @@ submitButton.addEventListener('click', async e => {
         return {
             url: item.url,
             keys: item.keys,
+            timeSpent: item.timeSpent,
             date: item.dateAsStr
         };
     });
-
+    console.log(logs);
     createChart(normilizeData(logs));
     info.innerHTML = '';
     let htmlText = '';
@@ -85,56 +86,60 @@ submitButton.addEventListener('click', async e => {
     htmlText +=
         `</div>`;
     info.innerHTML = htmlText;
-    //info.innerText = JSON.stringify(logs).replace(/}/g,"}\n\n");
-
     return false;
 });
 
 function normilizeData(data) {
-    const dates = data.map(item => item.date);
-    const times = [];
-    for (let i in dates) {
-        if (dates.hasOwnProperty(i)) {
-            if (i > 0) {
-                const time = new Date(dates[i]) - new Date(dates[i - 1]);
-                const normalTime = time.toString().length > 5
-                    ? new Date(time).getMinutes()
-                    : 1;
-                times.push(normalTime);
-            }
-        }
-    }
+    const times = data.map(item => item.timeSpent);
     const sites = data.map(item => /\/\/(.*?)\//.exec(item.url)[1]);
-    sites.pop();
+
     const dataset = {};
-    // console.log(times);
-    // for (let i = 0; i < sites.length; i++) {
-    //     dataset[sites[i]] = times[i];
-    // }
-    // console.log(dataset);
-    // return {sites, times};
+    Array.from(new Set(sites)).forEach(item => {
+        dataset[item] = 0;
+    });
+
+    for (let i = 0; i < sites.length; i++) {
+        dataset[sites[i]] += times[i];
+    }
+
+    for(let item of Object.keys(dataset)) {
+        dataset[item] = +dataset[item].toFixed(2);
+    }
+
+    return dataset;
 }
 
+function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 
 function createChart(dataset) {
     document.querySelector('div.chart').style.display = 'block';
 
+    const colors = Object.keys(dataset).map(() => {
+        return getRandomColor();
+    });
     myChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ["Africa", "Asia", "Europe", "Latin America", "North America"],
+            labels: Object.keys(dataset),
             datasets: [
                 {
-                    label: "Population (millions)",
-                    backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850"],
-                    data: [2478, 5267, 734, 784, 433]
+                    label: "Spending time",
+                    backgroundColor: colors,
+                    data: Object.values(dataset)
                 }
             ]
         },
         options: {
             title: {
                 display: true,
-                text: 'Predicted world population (millions) in 2050'
+                text: 'Time tracker'
             }
         }
     });
