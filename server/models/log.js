@@ -9,6 +9,7 @@ const logScema = new Schema({
     url: String,
     keys: String,
     timeSpent: Number,
+    sessionEnd: Boolean,
     deviceId:{
         type : String,
         required:true

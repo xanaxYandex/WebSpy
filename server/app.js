@@ -87,7 +87,8 @@ app.post('/addLog', async (req, res) => {
             deviceId: logData.deviceId,
             timeSpent: logData.timeSpent,
             keys: logData.keys,
-            dateAsStr: logData.date
+            dateAsStr: logData.date,
+            sessionEnd: logData.sessionEnd,
         });
         await log.save();
     } catch (e) {

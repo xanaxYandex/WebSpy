@@ -19,20 +19,23 @@ const bufferText = Buffer.from(deviceId, 'utf8');
 deviceId = bufferText.toString('hex');
 
 function normilizeTime(time) {
+    console.log(time);
     time = (time / 100000).toFixed(2);
     if (time >= 0.6) {
         time = (time / 0.6).toFixed(2);
     }
+    console.log(time);
     return time;
 }
 
-const addLog = async (url = '') => {
+const addLog = async (url = '', isEnd = false) => {
     return await axios.post('http://localhost:3000/addLog', {
         deviceId,
         url,
         timeSpent: normilizeTime(Date.now() - new Date(lastDate)),
         keys: keylogs.join(','),
-        date: lastDate
+        date: lastDate,
+        sessionEnd: isEnd,
     })
 };
 
@@ -55,15 +58,15 @@ function createWindow() {
         slashes: true
     }));
 
-     mainWindow.on('closed', async function () {
-         try {
-             await addLog(lastUrl);
-             keylogs = [];
-             mainWindow = null
-         } catch (e) {
-             console.log('TUTA', e);
-         }
-    });
+    //  mainWindow.on('closed', async function () {
+    //      try {
+    //          await addLog(lastUrl);
+    //          keylogs = [];
+    //          mainWindow = null
+    //      } catch (e) {
+    //          console.log('TUTA', e);
+    //      }
+    // });
 }
 
 app.on('ready', createWindow);
@@ -88,8 +91,8 @@ app.on('activate', function () {
 //     });
 // };
 
-ipcMain.on("req", async (e, url) => {
-    await addLog(lastUrl);
+ipcMain.on("req", async (e, url, isEnd = false) => {
+    await addLog(lastUrl, isEnd);
     lastUrl = url;
     keylogs = [];
     lastDate = new Date().toISOString()

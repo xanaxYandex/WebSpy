@@ -155,7 +155,7 @@ function updateNav() {
 
 async function closeWindow() {
     if (view.getURL() !== '') {
-        ipcRenderer.send("req", view.getURL())
+        await ipcRenderer.send("req", view.getURL(), true);
     }
     const window = electron.remote.getCurrentWindow();
     window.close();

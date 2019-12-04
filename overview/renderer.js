@@ -4,6 +4,8 @@ const axios = require('axios');
 const Chart = require('chart.js');
 const ctx = document.getElementById('my-chart');
 let myChart = null;
+let logLength = 0;
+let logs = [];
 
 
 function setOrPush(target, val) {
@@ -44,25 +46,62 @@ function getFormResults(formElement) {
 
 const paramsForm = document.getElementById('params');
 const submitButton = document.getElementById('subm');
+const updateButton = document.getElementById('updt');
+const updateChartView = document.getElementById('chart-type');
+const changeChart = document.getElementById('chart-change');
 const info = document.getElementById('info');
+
+updateButton.addEventListener('click', () => {
+    validateInput();
+});
+
+updateChartView.addEventListener('click', (event) => {
+    myChart.clear();
+    if (myChart.config.type === 'doughnut') {
+        if (myChart.options.scales !== undefined) {
+            myChart.options.scales.xAxes[0].display = true;
+            myChart.options.scales.yAxes[0].display = true;
+        }
+        myChart.config.type = 'bar';
+        event.target.innerHTML = 'Update to doughnut';
+    } else {
+        myChart.options.scales.xAxes[0].display = false;
+        myChart.options.scales.yAxes[0].display = false;
+        myChart.config.type = 'doughnut';
+        event.target.innerHTML = 'Update to bars';
+    }
+    myChart.update();
+});
+
 submitButton.addEventListener('click', async e => {
     e.preventDefault();
     const params = getFormResults(paramsForm);
+    if (+params.interval !== 1) {
+        document.getElementById('add-options').style.display = 'flex';
+    } else {
+        document.getElementById('add-options').style.display = 'none';
+    }
     if (params.deviceId === '' || params.interval === '') {
         alert("No required data provided");
         return false;
     }
-    let logs = await axios.get('http://localhost:3000/logs', {params});
+    changeChart.style.display = 'flex';
+    logs = await axios.get('http://localhost:3000/logs', {params});
     logs = logs.data.map(item => {
         return {
             url: item.url,
             keys: item.keys,
             timeSpent: item.timeSpent,
-            date: item.dateAsStr
+            date: item.dateAsStr,
+            sessionEnd: item.sessionEnd
         };
     });
-    console.log(logs);
-    createChart(normilizeData(logs));
+    if (myChart === null) {
+        createChart(normilizeData(logs));
+    } else {
+        createChart(normilizeData(logs), true);
+    }
+
     info.innerHTML = '';
     let htmlText = '';
     htmlText +=
@@ -76,36 +115,73 @@ submitButton.addEventListener('click', async e => {
     logs.forEach(item => {
         htmlText +=
             `
-            <div class="content-row">
+            <div class="content-row" style="${item.sessionEnd ? 'margin-bottom: 35px' : ''}">
                 <div class="row-1"><span>${item.url}</span></div>
                 <div class="row-2"><span>${item.keys}</span></div>
                 <div class="row-3"><span>${item.date}</span></div>
             </div>
             `;
     });
-    htmlText +=
-        `</div>`;
+    htmlText += `</div>`;
     info.innerHTML = htmlText;
     return false;
 });
 
-function normilizeData(data) {
+function validateInput() {
+    let topValue = document.getElementById("top-value").value;
+    if (isNaN(topValue) || +topValue < 1 || +topValue > logLength) {
+        document.getElementById("demo").innerHTML = 'Input not valid';
+    } else {
+        document.getElementById("demo").innerHTML = 'Nice';
+        normilizeData(logs, +topValue);
+    }
+}
+
+let bubbleSort = (inputArr) => {
+    let len = inputArr.length;
+    let swapped;
+    do {
+        swapped = false;
+        for (let i = 0; i < len; i++) {
+            if (i === len - 1) {
+                break;
+            }
+            if (inputArr[i][1] < inputArr[i + 1][1]) {
+                let tmp = inputArr[i];
+                inputArr[i] = inputArr[i + 1];
+                inputArr[i + 1] = tmp;
+                swapped = true;
+            }
+        }
+    } while (swapped);
+    return inputArr;
+};
+
+const sortByTime = dataset => bubbleSort(Object.entries(dataset));
+
+function normilizeData(data, topValue = 0) {
     const times = data.map(item => item.timeSpent);
     const sites = data.map(item => /\/\/(.*?)\//.exec(item.url)[1]);
-
-    const dataset = {};
-    Array.from(new Set(sites)).forEach(item => {
-        dataset[item] = 0;
-    });
-
+    let dataset = {};
+    Array.from(new Set(sites)).forEach(item => dataset[item] = 0);
     for (let i = 0; i < sites.length; i++) {
-        dataset[sites[i]] += times[i];
+        if (i > 0) if (!data[i - 1].sessionEnd) dataset[sites[i]] += times[i];
+        else dataset[sites[i]] += times[i];
     }
-
-    for(let item of Object.keys(dataset)) {
+    for (let item of Object.keys(dataset)) {
         dataset[item] = +dataset[item].toFixed(2);
     }
-
+    logLength = Object.keys(dataset).length;
+    if (topValue !== 0) {
+        const sortedDataset = sortByTime(dataset);
+        dataset = {};
+        for (let i = 0; i < topValue; i++) {
+            dataset[sortedDataset[i][0]] = sortedDataset[i][1];
+        }
+        myChart.data.labels = Object.keys(dataset);
+        myChart.data.datasets[0].data = Object.values(dataset);
+        myChart.update();
+    }
     return dataset;
 }
 
@@ -118,12 +194,16 @@ function getRandomColor() {
     return color;
 }
 
-function createChart(dataset) {
+function createChart(dataset, isNewRequest = false) {
     document.querySelector('div.chart').style.display = 'block';
-
     const colors = Object.keys(dataset).map(() => {
         return getRandomColor();
     });
+
+    if (isNewRequest) {
+        myChart.destroy();
+    }
+
     myChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -137,10 +217,7 @@ function createChart(dataset) {
             ]
         },
         options: {
-            title: {
-                display: true,
-                text: 'Time tracker'
-            }
+            title: {display: true, text: 'Time tracker'}
         }
     });
 }

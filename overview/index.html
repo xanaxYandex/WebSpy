@@ -25,11 +25,25 @@
                     <input type="radio" name="interval" value="2"><span> Weekly</span>
                     <input type="radio" name="interval" value="3"><span> Monthly</span>
                 </div>
-                <button id="subm">Get logs</button>
+                <button id="subm" class="subm">Get logs</button>
+                <div class="change-view" id="chart-change">
+                    <p>Click if you want to change the chart view</p>
+                    <button type="button" id="chart-type" class="subm">Update to bars</button>
+                </div>
+                <div class="additional-options" id="add-options">
+                    <p>Enter value of top amount of sites</p>
+                    <div class="topvalue-form">
+                        <input type="text" id="top-value">
+                        <button type="button" id="updt" class="subm">Update chart</button>
+                    </div>
+                    <p id="demo"></p>
+                </div>
+
             </div>
         </form>
         <div class="chart">
             <canvas id="my-chart" width="400" height="400"></canvas>
+
         </div>
     </div>
 

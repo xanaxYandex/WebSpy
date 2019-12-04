@@ -89,23 +89,43 @@ html, body {
                 }
             }
 
-            #subm {
-                transition: .3s;
-                font-family: "Segoe UI Light", sans-serif;
-                font-size: 23px;
-                padding: 10px;
-                border-radius: 50px;
-                border: 0;
-                background: #cae6c5;
-                outline: none;
+            .additional-options {
+                width: 100%;
+                display: none;
+                flex-direction: column;
+                align-items: center;
+                margin-top: 20px;
 
-                &:hover {
-                    transition: .3s;
-                    background: #d4dce6;
-                    font-size: 24px;
-                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.67);
+                p {
+                    font-family: "Segoe UI Light", sans-serif;
+                    font-size: 16px;
+                }
+
+                .topvalue-form {
+                    width: 100%;
+                    display: flex;
+                    justify-content: space-around;
+                }
+
+                input {
+                    transition: 0.3s;
+                    font-family: "Segoe UI Light", sans-serif;
+                    font-size: 20px;
+                    outline: none;
+                    padding: 5px 10px;
+                    border-radius: 50px;
+                    border: 0;
+                    box-shadow: 0 0 10px gray;
+                    width: 50px;
+
+                    &:hover {
+                        transition: .3s;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.67);
+                    }
                 }
             }
+
+
         }
 
         .chart {
@@ -119,12 +139,39 @@ html, body {
     }
 }
 
+.subm {
+    transition: .3s;
+    font-family: "Segoe UI Light", sans-serif;
+    font-size: 23px;
+    padding: 10px;
+    border-radius: 50px;
+    border: 0;
+    background: #cae6c5;
+    outline: none;
 
+    &:hover {
+        transition: .3s;
+        background: #d4dce6;
+        font-size: 24px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.67);
+    }
+}
+
+.change-view {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+
+        p {
+            font-family: "Segoe UI Light", sans-serif;
+            font-size: 16px;
+        }
+
+}
 
 .info-table {
     display: flex;
     flex-direction: column;
-    box-shadow: 0 0 10px #9d9d9d;
     width: 90%;
 
     .titles {
